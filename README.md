@@ -4,7 +4,7 @@
 ## 1. Team Identification
 
 **Repository Name:** Team3_AmazonReturnSystem_Kalvium-Community  
-**Sprint Duration:** Sprint 1 (5 Weeks)
+**Sprint Duration:** Sprint 1 (20 Days)
 
 ---
 
@@ -30,7 +30,7 @@
 
 **Git Strategy:** No direct commits to `main`. Every feature is developed in its own branch and merged through a Pull Request.
 
-- Every PR must be reviewed by at least one teammate.
+- Every PR must be reviewed by the team leader.
 - Use clear and meaningful commit messages.
 - Keep the README and project documentation updated.
 - Every member commits code regularly throughout the sprint.
