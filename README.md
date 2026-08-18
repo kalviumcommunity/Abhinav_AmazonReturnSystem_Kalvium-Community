@@ -1,46 +1,36 @@
-# Team3_AmazonReturnSystem_Kalvium-Community
-# Team Charter — Sprint 1
+This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
 
-## 1. Team Identification
+## Getting Started
 
-**Repository Name:** Team3_AmazonReturnSystem_Kalvium-Community  
-**Sprint Duration:** Sprint 1 (20 Days)
+First, run the development server:
 
----
+```bash
+npm run dev
+# or
+yarn dev
+# or
+pnpm dev
+# or
+bun dev
+```
 
-## 2. Team Members & Contribution Lanes
+Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
 
-| Lane | Assigned Member | Primary Focus | Responsibilities |
-|------|-----------------|---------------|------------------|
-| Lane 1: Frontend & UI | Mukthar M J | Next.js Frontend | UI development, responsive design, API integration, frontend testing |
-| Lane 2: Backend & APIs | Abhinav Ravi Shankar | Backend Development | REST APIs, business logic, GitHub administration, code reviews |
-| Lane 3: Database & Prisma | Aneeq Tadapatri | Database | Prisma schema, PostgreSQL, migrations, query optimization |
+You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
 
----
+This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
 
-## 3. Communication & Availability
+## Learn More
 
-**Primary Channel:** WhatsApp  
-**Standup:** One team member reports daily progress.  
-**Blockers:** If blocked for more than **30 minutes**, notify the team immediately in WhatsApp instead of working in isolation.
+To learn more about Next.js, take a look at the following resources:
 
----
+- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
+- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
 
-## 4. Operating Rules & Workflow
+You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
 
-**Git Strategy:** No direct commits to `main`. Every feature is developed in its own branch and merged through a Pull Request.
+## Deploy on Vercel
 
-- Every PR must be reviewed by the team leader.
-- Use clear and meaningful commit messages.
-- Keep the README and project documentation updated.
-- Every member commits code regularly throughout the sprint.
+The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
 
----
-
-## 5. Team Commitment
-
-- Work collaboratively and communicate openly.
-- Help teammates resolve blockers quickly.
-- Deliver assigned tasks on time.
-- Maintain clean, readable, and well-tested code.
-- Ensure every team member understands the project before the final viva.
+Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
