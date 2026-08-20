@@ -1,0 +1,5 @@
+# Root-level tooling output
+/.next/
+
+# This repository has separate backend and frontend packages.
+/package-lock.json
