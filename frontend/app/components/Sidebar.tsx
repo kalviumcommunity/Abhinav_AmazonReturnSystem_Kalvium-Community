@@ -1,15 +1,18 @@
 "use client";
 
+import Link from "next/link";
+import { usePathname } from "next/navigation";
+
 interface NavItem {
   label: string;
+  href: string;
   icon: React.ReactNode;
-  active?: boolean;
 }
 
 const navItems: NavItem[] = [
   {
     label: "Dashboard",
-    active: true,
+    href: "/dashboard",
     icon: (
       <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
         <rect x="3" y="3" width="7" height="7" rx="1.5" stroke="currentColor" strokeWidth="2"/>
@@ -21,6 +24,7 @@ const navItems: NavItem[] = [
   },
   {
     label: "Return Requests",
+    href: "/returns",
     icon: (
       <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
         <polyline points="1 4 1 10 7 10" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
@@ -30,6 +34,7 @@ const navItems: NavItem[] = [
   },
   {
     label: "Analytics",
+    href: "/analytics",
     icon: (
       <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
         <line x1="18" y1="20" x2="18" y2="10" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
@@ -40,6 +45,7 @@ const navItems: NavItem[] = [
   },
   {
     label: "Settings",
+    href: "/settings",
     icon: (
       <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
         <circle cx="12" cy="12" r="3" stroke="currentColor" strokeWidth="2"/>
@@ -50,21 +56,26 @@ const navItems: NavItem[] = [
 ];
 
 export default function Sidebar() {
+  const pathname = usePathname();
+
   return (
     <aside className="sidebar">
       <nav className="sidebar__nav">
         <ul className="sidebar__list">
-          {navItems.map((item) => (
-            <li key={item.label}>
-              <a
-                href="#"
-                className={`sidebar__item ${item.active ? "sidebar__item--active" : ""}`}
-              >
-                <span className="sidebar__icon">{item.icon}</span>
-                <span className="sidebar__label">{item.label}</span>
-              </a>
-            </li>
-          ))}
+          {navItems.map((item) => {
+            const isActive = pathname.startsWith(item.href);
+            return (
+              <li key={item.label}>
+                <Link
+                  href={item.href}
+                  className={`sidebar__item ${isActive ? "sidebar__item--active" : ""}`}
+                >
+                  <span className="sidebar__icon">{item.icon}</span>
+                  <span className="sidebar__label">{item.label}</span>
+                </Link>
+              </li>
+            );
+          })}
         </ul>
       </nav>
 
