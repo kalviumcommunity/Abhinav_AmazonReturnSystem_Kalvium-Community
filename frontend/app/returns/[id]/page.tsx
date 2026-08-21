@@ -1,16 +1,112 @@
+"use client";
+
+import { useEffect, useState, use } from "react";
 import Link from "next/link";
 import TopNav from "@/app/components/TopNav";
 import Sidebar from "@/app/components/Sidebar";
 import StatusBadge from "@/app/components/StatusBadge";
-import { allReturnRequests } from "@/app/data/mockData";
+import DecisionModal from "@/app/components/DecisionModal";
+import {
+  getReturnById,
+  approveReturn,
+  rejectReturn,
+} from "@/app/services/returnsService";
+import { ReturnRequest } from "@/app/data/mockData";
 
-interface ReturnDetailPageProps {
+interface PageProps {
   params: Promise<{ id: string }>;
 }
 
-export default async function ReturnDetailPage({ params }: ReturnDetailPageProps) {
-  const { id } = await params;
-  const returnItem = allReturnRequests.find((r) => r.id === id);
+export default function ReturnDetailPage({ params }: PageProps) {
+  const { id } = use(params);
+
+  const [returnItem, setReturnItem] = useState<ReturnRequest | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [modalType, setModalType] = useState<"approve" | "reject" | null>(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [feedback, setFeedback] = useState<{
+    type: "success" | "error";
+    message: string;
+  } | null>(null);
+
+  useEffect(() => {
+    async function loadData() {
+      setLoading(true);
+      const data = await getReturnById(id);
+      setReturnItem(data);
+      setLoading(false);
+    }
+    loadData();
+  }, [id]);
+
+  const handleOpenApprove = () => {
+    setFeedback(null);
+    setModalType("approve");
+  };
+
+  const handleOpenReject = () => {
+    setFeedback(null);
+    setModalType("reject");
+  };
+
+  const handleConfirmApprove = async () => {
+    if (!returnItem) return;
+    setIsSubmitting(true);
+    const result = await approveReturn(returnItem.id);
+    setIsSubmitting(false);
+
+    if (result.success && result.returnRequest) {
+      setReturnItem(result.returnRequest);
+      setFeedback({
+        type: "success",
+        message: result.message || "Return request approved successfully.",
+      });
+      setModalType(null);
+    } else {
+      setFeedback({
+        type: "error",
+        message: result.error || result.message || "Failed to approve return request.",
+      });
+    }
+  };
+
+  const handleConfirmReject = async (reason: string) => {
+    if (!returnItem) return;
+    setIsSubmitting(true);
+    const result = await rejectReturn(returnItem.id, reason);
+    setIsSubmitting(false);
+
+    if (result.success && result.returnRequest) {
+      setReturnItem(result.returnRequest);
+      setFeedback({
+        type: "success",
+        message: result.message || "Return request rejected successfully.",
+      });
+      setModalType(null);
+    } else {
+      setFeedback({
+        type: "error",
+        message: result.error || result.message || "Failed to reject return request.",
+      });
+    }
+  };
+
+  if (loading) {
+    return (
+      <div className="dashboard-layout">
+        <TopNav />
+        <div className="dashboard-layout__body">
+          <Sidebar />
+          <main className="dashboard-main">
+            <div className="returns-loading">
+              <div className="returns-loading__spinner" />
+              <p>Loading return request details...</p>
+            </div>
+          </main>
+        </div>
+      </div>
+    );
+  }
 
   if (!returnItem) {
     return (
@@ -22,7 +118,9 @@ export default async function ReturnDetailPage({ params }: ReturnDetailPageProps
             <div className="return-detail">
               <div className="return-detail__not-found">
                 <h1>Return Not Found</h1>
-                <p>The return request <strong>{id}</strong> does not exist.</p>
+                <p>
+                  The return request <strong>{id}</strong> could not be found.
+                </p>
                 <Link href="/returns" className="return-detail__back-btn">
                   ← Back to Return Requests
                 </Link>
@@ -33,6 +131,8 @@ export default async function ReturnDetailPage({ params }: ReturnDetailPageProps
       </div>
     );
   }
+
+  const isPending = returnItem.status === "Pending";
 
   return (
     <div className="dashboard-layout">
@@ -46,22 +146,111 @@ export default async function ReturnDetailPage({ params }: ReturnDetailPageProps
               Return Requests
             </Link>
             <span className="return-detail__breadcrumb-sep">/</span>
-            <span className="return-detail__breadcrumb-current">{returnItem.id}</span>
+            <span className="return-detail__breadcrumb-current">
+              {returnItem.id}
+            </span>
           </div>
+
+          {/* Feedback Alert Banner */}
+          {feedback && (
+            <div
+              className={`feedback-banner feedback-banner--${feedback.type}`}
+              role="alert"
+            >
+              <span className="feedback-banner__icon">
+                {feedback.type === "success" ? "✓" : "⚠"}
+              </span>
+              <div className="feedback-banner__text">
+                <strong>
+                  {feedback.type === "success" ? "Success" : "Error"}:
+                </strong>{" "}
+                {feedback.message}
+              </div>
+              <button
+                type="button"
+                onClick={() => setFeedback(null)}
+                className="feedback-banner__close"
+                aria-label="Dismiss feedback"
+              >
+                ✕
+              </button>
+            </div>
+          )}
 
           <div className="return-detail">
             {/* Header */}
             <div className="return-detail__header">
               <div>
-                <h1 className="return-detail__title">
-                  Return Request {returnItem.id}
-                </h1>
+                <div className="return-detail__title-row">
+                  <h1 className="return-detail__title">
+                    Return Request {returnItem.id}
+                  </h1>
+                  <StatusBadge status={returnItem.status} />
+                </div>
                 <p className="return-detail__subtitle">
-                  Submitted on {returnItem.requested}
+                  Submitted on {returnItem.requested} • Order:{" "}
+                  <strong>{returnItem.orderId}</strong>
                 </p>
               </div>
-              <StatusBadge status={returnItem.status} />
+
+              {/* Action Buttons for Pending items */}
+              {isPending ? (
+                <div className="decision-actions">
+                  <button
+                    type="button"
+                    onClick={handleOpenReject}
+                    className="decision-btn decision-btn--reject"
+                  >
+                    <span className="decision-btn__icon">✕</span> Reject Request
+                  </button>
+                  <button
+                    type="button"
+                    onClick={handleOpenApprove}
+                    className="decision-btn decision-btn--approve"
+                  >
+                    <span className="decision-btn__icon">✓</span> Approve Request
+                  </button>
+                </div>
+              ) : (
+                <div className="decision-locked-badge">
+                  <span className="decision-locked-icon">🔒</span>
+                  <span>Decision Completed ({returnItem.status})</span>
+                </div>
+              )}
             </div>
+
+            {/* Decision Status Callout if already resolved */}
+            {!isPending && (
+              <div
+                className={`decision-callout decision-callout--${returnItem.status
+                  .toLowerCase()
+                  .replace(" ", "-")}`}
+              >
+                <div className="decision-callout__icon">
+                  {returnItem.status === "Approved" ||
+                  returnItem.status === "Auto Approved"
+                    ? "✓"
+                    : "✕"}
+                </div>
+                <div className="decision-callout__content">
+                  <h4 className="decision-callout__title">
+                    This return request was marked as{" "}
+                    <strong>{returnItem.status}</strong>
+                  </h4>
+                  <p className="decision-callout__meta">
+                    Decided by: {returnItem.decidedBy || "System Policy"}
+                    {returnItem.decidedAt &&
+                      ` on ${returnItem.decidedAt}`}
+                  </p>
+                  {returnItem.rejectionReason && (
+                    <div className="decision-callout__reason">
+                      <strong>Rejection Reason:</strong>{" "}
+                      {returnItem.rejectionReason}
+                    </div>
+                  )}
+                </div>
+              </div>
+            )}
 
             {/* Info Grid */}
             <div className="return-detail__grid">
@@ -73,11 +262,15 @@ export default async function ReturnDetailPage({ params }: ReturnDetailPageProps
                 </div>
                 <div className="return-detail__field">
                   <span className="return-detail__label">Order ID</span>
-                  <span className="return-detail__value">{returnItem.orderId}</span>
+                  <span className="return-detail__value">
+                    {returnItem.orderId}
+                  </span>
                 </div>
                 <div className="return-detail__field">
                   <span className="return-detail__label">Request Date</span>
-                  <span className="return-detail__value">{returnItem.requested}</span>
+                  <span className="return-detail__value">
+                    {returnItem.requested}
+                  </span>
                 </div>
                 <div className="return-detail__field">
                   <span className="return-detail__label">Status</span>
@@ -85,28 +278,54 @@ export default async function ReturnDetailPage({ params }: ReturnDetailPageProps
                     <StatusBadge status={returnItem.status} />
                   </span>
                 </div>
+                {returnItem.decidedAt && (
+                  <div className="return-detail__field">
+                    <span className="return-detail__label">Decision Date</span>
+                    <span className="return-detail__value">
+                      {returnItem.decidedAt}
+                    </span>
+                  </div>
+                )}
+                {returnItem.decidedBy && (
+                  <div className="return-detail__field">
+                    <span className="return-detail__label">Decided By</span>
+                    <span className="return-detail__value">
+                      {returnItem.decidedBy}
+                    </span>
+                  </div>
+                )}
               </div>
 
               <div className="return-detail__card">
                 <h3 className="return-detail__card-title">Product Details</h3>
                 <div className="return-detail__field">
-                  <span className="return-detail__label">Product</span>
-                  <span className="return-detail__value">{returnItem.product}</span>
+                  <span className="return-detail__label">Product Name</span>
+                  <span className="return-detail__value">
+                    {returnItem.product}
+                  </span>
                 </div>
                 <div className="return-detail__field">
-                  <span className="return-detail__label">Customer</span>
-                  <span className="return-detail__value">{returnItem.customer}</span>
+                  <span className="return-detail__label">Customer Name</span>
+                  <span className="return-detail__value">
+                    {returnItem.customer}
+                  </span>
                 </div>
                 <div className="return-detail__field">
-                  <span className="return-detail__label">Reason</span>
-                  <span className="return-detail__value return-detail__value--muted">
-                    Not available (placeholder)
+                  <span className="return-detail__label">Rejection Reason</span>
+                  <span
+                    className={`return-detail__value ${
+                      returnItem.rejectionReason
+                        ? "return-detail__value--reason"
+                        : "return-detail__value--muted"
+                    }`}
+                  >
+                    {returnItem.rejectionReason || "None"}
                   </span>
                 </div>
               </div>
             </div>
 
-            {/* Actions */}
+            {/* Bottom Actions */}
             <div className="return-detail__actions">
               <Link href="/returns" className="return-detail__back-btn">
                 ← Back to Return Requests
@@ -115,6 +334,19 @@ export default async function ReturnDetailPage({ params }: ReturnDetailPageProps
           </div>
         </main>
       </div>
+
+      {/* Decision Modal (Approve or Reject) */}
+      <DecisionModal
+        isOpen={modalType !== null}
+        type={modalType}
+        returnId={returnItem.id}
+        customer={returnItem.customer}
+        product={returnItem.product}
+        isSubmitting={isSubmitting}
+        onClose={() => setModalType(null)}
+        onConfirmApprove={handleConfirmApprove}
+        onConfirmReject={handleConfirmReject}
+      />
     </div>
   );
 }

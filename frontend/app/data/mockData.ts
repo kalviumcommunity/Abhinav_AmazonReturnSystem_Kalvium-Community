@@ -7,6 +7,9 @@ export interface ReturnRequest {
   customer: string;
   requested: string;
   status: ReturnStatus;
+  rejectionReason?: string;
+  decidedAt?: string;
+  decidedBy?: string;
 }
 
 export const statusFilters: Array<"All" | ReturnStatus> = [
