@@ -1,8 +1,6 @@
 // This is your Prisma schema file,
 // learn more about it in the docs: https://pris.ly/d/prisma-schema
 
-// Get a free hosted Postgres database in seconds: `npx create-db`
-
 generator client {
   provider = "prisma-client"
   output   = "../src/generated/prisma"
@@ -10,4 +8,35 @@ generator client {
 
 datasource db {
   provider = "postgresql"
+}
+
+enum ReturnStatus {
+  PENDING
+  APPROVED
+  REJECTED
+  AUTO_APPROVED
+}
+
+model ReturnRequest {
+  id              String        @id @default(cuid())
+  orderId         String?
+  product         String?
+  customer        String?
+  status          ReturnStatus  @default(PENDING)
+  decidedBy       String?
+  decidedAt       DateTime?
+  rejectionReason String?
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+  auditLogs       AuditLog[]
+}
+
+model AuditLog {
+  id              String         @id @default(cuid())
+  returnRequestId String?
+  returnRequest   ReturnRequest? @relation(fields: [returnRequestId], references: [id])
+  action          String
+  actor           String
+  reason          String?
+  createdAt       DateTime       @default(now())
 }
