@@ -1,10 +1,16 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
+import { requireSession } from "@/lib/auth";
 
 export async function POST(
   request: Request,
   { params }: { params: Promise<{ id: string }> }
 ) {
+  const auth = requireSession(request);
+  if (auth.response) {
+    return auth.response;
+  }
+
   try {
     const { id } = await params;
 
@@ -31,7 +37,7 @@ export async function POST(
         where: { id },
         data: {
           status: "APPROVED",
-          decidedBy: "SYSTEM_MOCK",
+          decidedBy: auth.session.email,
           decidedAt: new Date(),
         },
       }),
@@ -39,7 +45,7 @@ export async function POST(
         data: {
           returnRequestId: id,
           action: "APPROVED",
-          actor: "SYSTEM_MOCK",
+          actor: auth.session.email,
         },
       }),
     ]);

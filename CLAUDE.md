@@ -30,16 +30,19 @@ npx prisma migrate dev    # create/apply a migration (no migrations exist yet �
 npx prisma studio         # inspect the DB
 ```
 
-The backend requires a `DATABASE_URL` env var (Postgres) — see `backend/prisma.config.ts` and `backend/src/lib/prisma.ts`.
+The backend requires `DATABASE_URL` (Postgres) and `JWT_SECRET` env vars — see `backend/.env.example`, `backend/prisma.config.ts`, `backend/src/lib/prisma.ts`, and `backend/src/lib/auth.ts`.
+
+Seed a test user (`seller@example.com` / `password123`) via `npx prisma db seed` (wired through `prisma.config.ts` → `prisma/seed.ts`, run with `tsx`).
 
 There is no test runner configured in either app.
 
 ## Backend architecture
 
-- Prisma schema: `backend/prisma/schema.prisma`. Two models: `ReturnRequest` (status is an enum: `PENDING`, `APPROVED`, `REJECTED`, `AUTO_APPROVED`) and `AuditLog`, linked 1-to-many. Every state change on a `ReturnRequest` should be paired with an `AuditLog` row written in the same `prisma.$transaction`.
+- Prisma schema: `backend/prisma/schema.prisma`. Models: `ReturnRequest` (status is an enum: `PENDING`, `APPROVED`, `REJECTED`, `AUTO_APPROVED`), `AuditLog` (1-to-many off `ReturnRequest`), and `User` (email/passwordHash/role, for auth). Every state change on a `ReturnRequest` should be paired with an `AuditLog` row written in the same `prisma.$transaction`.
 - Prisma client is generated to `backend/src/generated/prisma` (gitignored) and imported from `@/lib/prisma` (`backend/src/lib/prisma.ts`), which wraps it in a `PrismaPg` adapter and caches the instance on `globalThis` in dev to avoid connection exhaustion from hot-reload.
-- API routes live under `backend/src/app/api/returns/[id]/` — `approve/route.ts` and `reject/route.ts` are the two decision endpoints. Both follow the same pattern: look up the `ReturnRequest`, 404 if missing, 409 if `status !== "PENDING"`, then `$transaction([update, auditLog.create])` and return the updated record + audit log as JSON. `decidedBy`/`actor` is currently hardcoded to `"SYSTEM_MOCK"` (no auth yet). `reject` additionally requires and validates a non-empty `reason` string in the JSON body.
-- `backend/src/app/api/returns/[id]/route.ts` and `backend/src/app/health/route.ts` are still stub/placeholder handlers (return static JSON, not wired to Prisma) — don't assume they reflect real data yet.
+- **Auth**: `backend/src/lib/auth.ts` issues/verifies JWT sessions (`signSession`/`verifySession`, `SESSION_TTL_SECONDS` 24h). `POST /api/auth/login` (`backend/src/app/api/auth/login/route.ts`) checks email/bcrypt-hashed password against `User`, then both sets an httpOnly `session` cookie and returns the token in the JSON body (for `Authorization: Bearer <token>` clients). Route handlers guard themselves with `requireSession(request)`, which reads the token from the `session` cookie or a `Bearer` header and returns either `{ session }` or a ready-to-return 401 `{ response }` — always check `if (auth.response) return auth.response;` first. All routes under `backend/src/app/api/returns/` (list, detail, approve, reject) are guarded this way; `decidedBy`/`actor` on approve/reject now come from `auth.session.email` instead of a hardcoded value.
+- API routes live under `backend/src/app/api/returns/` — `route.ts` (list), `[id]/route.ts` (detail), `[id]/approve/route.ts`, `[id]/reject/route.ts`. Approve/reject follow the same pattern: look up the `ReturnRequest`, 404 if missing, 409 if `status !== "PENDING"`, then `$transaction([update, auditLog.create])` and return the updated record + audit log as JSON. `reject` additionally requires and validates a non-empty `reason` string in the JSON body.
+- `backend/src/app/health/route.ts` is still a stub/placeholder handler (returns static JSON) and is intentionally unauthenticated.
 - `backend/src/lib/errors.ts` defines an `ApiError` class that is not currently used by any route (routes catch errors ad hoc and return `{ error: message }` inline) — follow the existing ad hoc pattern in new routes unless asked to refactor towards `ApiError`.
 
 ## Frontend architecture
