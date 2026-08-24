@@ -23,7 +23,6 @@ export const statusFilters: Array<"All" | ReturnStatus> = [
 export interface SummaryCard {
   title: string;
   value: number;
-  icon: string;
   color: string;
   bgColor: string;
 }
@@ -37,28 +36,24 @@ export const summaryCards: SummaryCard[] = [
   {
     title: "Pending Returns",
     value: 24,
-    icon: "⏳",
     color: "#f59e0b",
     bgColor: "rgba(245, 158, 11, 0.1)",
   },
   {
     title: "Approved",
     value: 156,
-    icon: "✅",
     color: "#10b981",
     bgColor: "rgba(16, 185, 129, 0.1)",
   },
   {
     title: "Rejected",
     value: 12,
-    icon: "❌",
     color: "#ef4444",
     bgColor: "rgba(239, 68, 68, 0.1)",
   },
   {
     title: "Auto Approved",
     value: 89,
-    icon: "⚡",
     color: "#6366f1",
     bgColor: "rgba(99, 102, 241, 0.1)",
   },
