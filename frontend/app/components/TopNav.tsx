@@ -1,9 +1,23 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
+import { useAuth } from "@/app/context/AuthContext";
 
 export default function TopNav() {
   const [searchQuery, setSearchQuery] = useState("");
+  const [showDropdown, setShowDropdown] = useState(false);
+  const { user, logout } = useAuth();
+  const dropdownRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    function handleClickOutside(event: MouseEvent) {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+        setShowDropdown(false);
+      }
+    }
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
 
   return (
     <header className="top-nav">
@@ -42,12 +56,33 @@ export default function TopNav() {
           <span className="top-nav__badge">3</span>
         </button>
 
-        <div className="top-nav__profile">
-          <div className="top-nav__avatar">AS</div>
-          <span className="top-nav__seller-name">Abhinav Store</span>
-          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <path d="M6 9l6 6 6-6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-          </svg>
+        <div className="top-nav__profile-container" ref={dropdownRef}>
+          <div 
+            className="top-nav__profile" 
+            onClick={() => setShowDropdown(!showDropdown)}
+            role="button"
+            tabIndex={0}
+          >
+            <div className="top-nav__avatar">
+              {user?.name ? user.name.charAt(0).toUpperCase() : "S"}
+            </div>
+            <span className="top-nav__seller-name">{user?.name || "Seller"}</span>
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M6 9l6 6 6-6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+            </svg>
+          </div>
+
+          {showDropdown && (
+            <div className="top-nav__dropdown">
+              <div className="top-nav__dropdown-header">
+                <p className="top-nav__dropdown-name">{user?.name || "Seller"}</p>
+                <p className="top-nav__dropdown-email">{user?.email || ""}</p>
+              </div>
+              <button className="top-nav__dropdown-item" onClick={logout}>
+                Sign out
+              </button>
+            </div>
+          )}
         </div>
       </div>
     </header>
