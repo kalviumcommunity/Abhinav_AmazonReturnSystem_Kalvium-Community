@@ -8,9 +8,16 @@ export async function GET(request: Request) {
     return auth.response;
   }
 
-  const returnRequests = await prisma.returnRequest.findMany({
-    orderBy: { createdAt: "desc" },
-  });
+  try {
+    const returnRequests = await prisma.returnRequest.findMany({
+      orderBy: { createdAt: "desc" },
+    });
 
-  return NextResponse.json({ returnRequests });
+    return NextResponse.json({ returnRequests });
+  } catch (error) {
+    return NextResponse.json(
+      { error: error instanceof Error ? error.message : "Internal Server Error" },
+      { status: 500 }
+    );
+  }
 }
