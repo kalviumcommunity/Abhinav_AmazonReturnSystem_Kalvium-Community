@@ -13,17 +13,24 @@ export async function GET(
 
   const { id } = await params;
 
-  const returnRequest = await prisma.returnRequest.findUnique({
-    where: { id },
-    include: { auditLogs: true },
-  });
+  try {
+    const returnRequest = await prisma.returnRequest.findUnique({
+      where: { id },
+      include: { auditLogs: true },
+    });
 
-  if (!returnRequest) {
+    if (!returnRequest) {
+      return NextResponse.json(
+        { error: "Return request not found" },
+        { status: 404 }
+      );
+    }
+
+    return NextResponse.json({ returnRequest });
+  } catch (error) {
     return NextResponse.json(
-      { error: "Return request not found" },
-      { status: 404 }
+      { error: error instanceof Error ? error.message : "Internal Server Error" },
+      { status: 500 }
     );
   }
-
-  return NextResponse.json({ returnRequest });
 }
