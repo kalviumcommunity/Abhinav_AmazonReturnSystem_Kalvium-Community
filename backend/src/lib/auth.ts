@@ -8,6 +8,7 @@ export interface SessionPayload {
   sub: string;
   email: string;
   role: string;
+  name?: string;
 }
 
 function getJwtSecret(): string {
