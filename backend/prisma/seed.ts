@@ -9,6 +9,7 @@ const prisma = new PrismaClient({ adapter });
 async function main() {
   const passwordHash = await bcrypt.hash("password123", 10);
 
+  // Seed SELLER test user
   await prisma.user.upsert({
     where: { email: "seller@example.com" },
     update: {},
@@ -19,6 +20,20 @@ async function main() {
       role: "SELLER",
     },
   });
+
+  // Seed CUSTOMER_SUPPORT test user
+  await prisma.user.upsert({
+    where: { email: "support@example.com" },
+    update: {},
+    create: {
+      email: "support@example.com",
+      passwordHash,
+      name: "Demo Support Agent",
+      role: "CUSTOMER_SUPPORT",
+    },
+  });
+
+  console.log("✅ Seeded users: seller@example.com (SELLER), support@example.com (CUSTOMER_SUPPORT)");
 }
 
 main()

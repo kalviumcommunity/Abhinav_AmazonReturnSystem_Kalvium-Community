@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { requireSession } from "@/lib/auth";
+import { requireRole, Roles } from "@/lib/rbac";
 
 export async function POST(
   request: Request,
@@ -10,6 +11,12 @@ export async function POST(
   if (auth.response) {
     return auth.response;
   }
+
+  const { session } = auth;
+
+  // Only SELLER and CUSTOMER_SUPPORT may reject returns.
+  const forbidden = requireRole(session, [Roles.SELLER, Roles.CUSTOMER_SUPPORT]);
+  if (forbidden) return forbidden;
 
   try {
     const { id } = await params;
@@ -43,6 +50,21 @@ export async function POST(
       );
     }
 
+    // SELLER may only reject their own return requests.
+    if (
+      session.role === Roles.SELLER &&
+      returnRequest.sellerId !== session.sub
+    ) {
+      return NextResponse.json(
+        {
+          error: "Forbidden",
+          code: "INSUFFICIENT_PERMISSIONS",
+          message: "You do not have permission to reject this return request.",
+        },
+        { status: 403 }
+      );
+    }
+
     if (returnRequest.status !== "PENDING") {
       return NextResponse.json(
         { error: "Return request is not in PENDING status" },
@@ -50,13 +72,18 @@ export async function POST(
       );
     }
 
+    // Use session.sub (user ID) as the authoritative actor identity in audit logs,
+    // replacing the Day 4 SYSTEM_MOCK / email-based actor.
+    const actorId = session.sub;
+    const actorDisplay = session.name ?? session.email;
+
     const [updatedReturnRequest, auditLog] = await prisma.$transaction([
       prisma.returnRequest.update({
         where: { id },
         data: {
           status: "REJECTED",
           rejectionReason: reason.trim(),
-          decidedBy: auth.session.email,
+          decidedBy: actorId,
           decidedAt: new Date(),
         },
       }),
@@ -64,7 +91,8 @@ export async function POST(
         data: {
           returnRequestId: id,
           action: "REJECTED",
-          actor: auth.session.email,
+          // actor stores the user ID for traceability; actorDisplay carries the human-readable name.
+          actor: `${actorId} (${actorDisplay})`,
           reason: reason.trim(),
         },
       }),

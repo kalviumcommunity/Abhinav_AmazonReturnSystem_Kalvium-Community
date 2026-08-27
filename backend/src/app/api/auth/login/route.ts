@@ -36,7 +36,7 @@ export async function POST(request: Request) {
       );
     }
 
-    const token = signSession({ sub: user.id, email: user.email, role: user.role });
+    const token = signSession({ sub: user.id, email: user.email, role: user.role, name: user.name ?? undefined });
 
     const response = NextResponse.json({
       message: "Login successful",
