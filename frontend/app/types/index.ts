@@ -4,7 +4,8 @@
  */
 
 // ─── Backend API Base URL ───────────────────────────────
-export const API_BASE_URL = "http://localhost:3001";
+export const API_BASE_URL =
+  process.env.NEXT_PUBLIC_API_BASE_URL ?? "http://localhost:3001";
 
 // ─── Return Status ──────────────────────────────────────
 export type ReturnStatus = "PENDING" | "APPROVED" | "REJECTED" | "AUTO_APPROVED";
