@@ -1,8 +1,8 @@
 import React from "react";
-import { SummaryCard as SummaryCardType } from "@/app/data/mockData";
+import { SummaryCardData } from "@/app/types";
 
 interface SummaryCardProps {
-  card: SummaryCardType;
+  card: SummaryCardData;
 }
 
 function getCardIcon(title: string) {

@@ -1,7 +1,4 @@
-import { allReturnRequests, ReturnRequest } from "@/app/data/mockData";
-
-// Shared state for in-memory tracking of decisions across the session
-let returnStore: ReturnRequest[] = [...allReturnRequests];
+import { API_BASE_URL, ReturnRequest } from "@/app/types";
 
 export interface DecisionResult {
   success: boolean;
@@ -11,102 +8,113 @@ export interface DecisionResult {
 }
 
 /**
- * Service to fetch and manage return request decisions.
- * Designed to mirror backend API contracts so it can be swapped with real HTTP calls.
+ * Parses an error response from the backend into a user-friendly message.
  */
-export async function getReturnById(id: string): Promise<ReturnRequest | null> {
-  const item = returnStore.find((r) => r.id === id);
-  return item ? { ...item } : null;
+async function parseError(response: Response): Promise<string> {
+  try {
+    const data = await response.json();
+    return data.error || data.message || `Request failed (${response.status})`;
+  } catch {
+    switch (response.status) {
+      case 401:
+        return "You are not authenticated. Please sign in again.";
+      case 403:
+        return "You do not have permission to perform this action.";
+      case 404:
+        return "The requested return was not found.";
+      case 409:
+        return "This return has already been decided.";
+      default:
+        return `An unexpected error occurred (${response.status}).`;
+    }
+  }
 }
 
+/**
+ * Fetch all return requests from the backend.
+ */
 export async function getAllReturns(): Promise<ReturnRequest[]> {
-  return [...returnStore];
+  const response = await fetch(`${API_BASE_URL}/api/returns`, {
+    credentials: "include",
+  });
+
+  if (!response.ok) {
+    const msg = await parseError(response);
+    throw new Error(msg);
+  }
+
+  const data = await response.json();
+  return data.returnRequests ?? [];
 }
 
+/**
+ * Fetch a single return request by ID, including audit logs.
+ */
+export async function getReturnById(
+  id: string
+): Promise<ReturnRequest | null> {
+  const response = await fetch(`${API_BASE_URL}/api/returns/${id}`, {
+    credentials: "include",
+  });
+
+  if (response.status === 404) {
+    return null;
+  }
+
+  if (!response.ok) {
+    const msg = await parseError(response);
+    throw new Error(msg);
+  }
+
+  const data = await response.json();
+  return data.returnRequest ?? null;
+}
+
+/**
+ * Approve a return request.
+ */
 export async function approveReturn(id: string): Promise<DecisionResult> {
-  // Simulate network latency
-  await new Promise((resolve) => setTimeout(resolve, 300));
+  const response = await fetch(`${API_BASE_URL}/api/returns/${id}/approve`, {
+    method: "POST",
+    credentials: "include",
+  });
 
-  const index = returnStore.findIndex((r) => r.id === id);
-  if (index === -1) {
-    return {
-      success: false,
-      message: "Return request not found",
-      error: "Return request not found",
-    };
+  if (!response.ok) {
+    const msg = await parseError(response);
+    return { success: false, message: msg, error: msg };
   }
 
-  const existing = returnStore[index];
-  if (existing.status !== "Pending") {
-    return {
-      success: false,
-      message: `Cannot approve: Return is already ${existing.status}`,
-      error: `Return request is not in Pending status (currently ${existing.status})`,
-    };
-  }
-
-  const updated: ReturnRequest = {
-    ...existing,
-    status: "Approved",
-    decidedBy: "Seller (Abhinav)",
-    decidedAt: new Date().toISOString().split("T")[0],
-  };
-
-  returnStore[index] = updated;
-
+  const data = await response.json();
   return {
     success: true,
-    message: "Return request approved successfully",
-    returnRequest: updated,
+    message: data.message || "Return request approved successfully.",
+    returnRequest: data.returnRequest,
   };
 }
 
+/**
+ * Reject a return request with a reason.
+ */
 export async function rejectReturn(
   id: string,
   reason: string
 ): Promise<DecisionResult> {
-  // Simulate network latency
-  await new Promise((resolve) => setTimeout(resolve, 300));
+  const response = await fetch(`${API_BASE_URL}/api/returns/${id}/reject`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    credentials: "include",
+    body: JSON.stringify({ reason }),
+  });
 
-  if (!reason || typeof reason !== "string" || reason.trim() === "") {
-    return {
-      success: false,
-      message: "Rejection reason is required",
-      error: "Rejection reason is required and must not be empty",
-    };
+  if (!response.ok) {
+    const msg = await parseError(response);
+    return { success: false, message: msg, error: msg };
   }
 
-  const index = returnStore.findIndex((r) => r.id === id);
-  if (index === -1) {
-    return {
-      success: false,
-      message: "Return request not found",
-      error: "Return request not found",
-    };
-  }
-
-  const existing = returnStore[index];
-  if (existing.status !== "Pending") {
-    return {
-      success: false,
-      message: `Cannot reject: Return is already ${existing.status}`,
-      error: `Return request is not in Pending status (currently ${existing.status})`,
-    };
-  }
-
-  const updated: ReturnRequest = {
-    ...existing,
-    status: "Rejected",
-    rejectionReason: reason.trim(),
-    decidedBy: "Seller (Abhinav)",
-    decidedAt: new Date().toISOString().split("T")[0],
-  };
-
-  returnStore[index] = updated;
-
+  const data = await response.json();
   return {
     success: true,
-    message: "Return request rejected successfully",
-    returnRequest: updated,
+    message: data.message || "Return request rejected successfully.",
+    returnRequest: data.returnRequest,
   };
 }

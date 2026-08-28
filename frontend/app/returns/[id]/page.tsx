@@ -11,7 +11,7 @@ import {
   approveReturn,
   rejectReturn,
 } from "@/app/services/returnsService";
-import { ReturnRequest } from "@/app/data/mockData";
+import { ReturnRequest, statusDisplayLabel } from "@/app/types";
 
 interface PageProps {
   params: Promise<{ id: string }>;
@@ -22,6 +22,7 @@ export default function ReturnDetailPage({ params }: PageProps) {
 
   const [returnItem, setReturnItem] = useState<ReturnRequest | null>(null);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const [modalType, setModalType] = useState<"approve" | "reject" | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [feedback, setFeedback] = useState<{
@@ -32,9 +33,15 @@ export default function ReturnDetailPage({ params }: PageProps) {
   useEffect(() => {
     async function loadData() {
       setLoading(true);
-      const data = await getReturnById(id);
-      setReturnItem(data);
-      setLoading(false);
+      setError(null);
+      try {
+        const data = await getReturnById(id);
+        setReturnItem(data);
+      } catch (err: any) {
+        setError(err.message || "Failed to load return request.");
+      } finally {
+        setLoading(false);
+      }
     }
     loadData();
   }, [id]);
@@ -108,6 +115,26 @@ export default function ReturnDetailPage({ params }: PageProps) {
     );
   }
 
+  if (error) {
+    return (
+      <div className="dashboard-layout">
+        <TopNav />
+        <div className="dashboard-layout__body">
+          <Sidebar />
+          <main className="dashboard-main">
+            <div className="return-detail__not-found">
+              <h1>Error</h1>
+              <p>{error}</p>
+              <Link href="/returns" className="return-detail__back-btn">
+                ← Back to Return Requests
+              </Link>
+            </div>
+          </main>
+        </div>
+      </div>
+    );
+  }
+
   if (!returnItem) {
     return (
       <div className="dashboard-layout">
@@ -132,7 +159,7 @@ export default function ReturnDetailPage({ params }: PageProps) {
     );
   }
 
-  const isPending = returnItem.status === "Pending";
+  const isPending = returnItem.status === "PENDING";
 
   return (
     <div className="dashboard-layout">
@@ -188,7 +215,8 @@ export default function ReturnDetailPage({ params }: PageProps) {
                   <StatusBadge status={returnItem.status} />
                 </div>
                 <p className="return-detail__subtitle">
-                  Submitted on {returnItem.requested} • Order:{" "}
+                  Submitted on{" "}
+                  {new Date(returnItem.createdAt).toLocaleDateString()} • Order:{" "}
                   <strong>{returnItem.orderId}</strong>
                 </p>
               </div>
@@ -214,7 +242,7 @@ export default function ReturnDetailPage({ params }: PageProps) {
               ) : (
                 <div className="decision-locked-badge">
                   <span className="decision-locked-icon">🔒</span>
-                  <span>Decision Completed ({returnItem.status})</span>
+                  <span>Decision Completed ({statusDisplayLabel[returnItem.status]})</span>
                 </div>
               )}
             </div>
@@ -224,23 +252,23 @@ export default function ReturnDetailPage({ params }: PageProps) {
               <div
                 className={`decision-callout decision-callout--${returnItem.status
                   .toLowerCase()
-                  .replace(" ", "-")}`}
+                  .replace("_", "-")}`}
               >
                 <div className="decision-callout__icon">
-                  {returnItem.status === "Approved" ||
-                  returnItem.status === "Auto Approved"
+                  {returnItem.status === "APPROVED" ||
+                  returnItem.status === "AUTO_APPROVED"
                     ? "✓"
                     : "✕"}
                 </div>
                 <div className="decision-callout__content">
                   <h4 className="decision-callout__title">
                     This return request was marked as{" "}
-                    <strong>{returnItem.status}</strong>
+                    <strong>{statusDisplayLabel[returnItem.status]}</strong>
                   </h4>
                   <p className="decision-callout__meta">
                     Decided by: {returnItem.decidedBy || "System Policy"}
                     {returnItem.decidedAt &&
-                      ` on ${returnItem.decidedAt}`}
+                      ` on ${new Date(returnItem.decidedAt).toLocaleDateString()}`}
                   </p>
                   {returnItem.rejectionReason && (
                     <div className="decision-callout__reason">
@@ -269,7 +297,7 @@ export default function ReturnDetailPage({ params }: PageProps) {
                 <div className="return-detail__field">
                   <span className="return-detail__label">Request Date</span>
                   <span className="return-detail__value">
-                    {returnItem.requested}
+                    {new Date(returnItem.createdAt).toLocaleDateString()}
                   </span>
                 </div>
                 <div className="return-detail__field">
@@ -282,7 +310,7 @@ export default function ReturnDetailPage({ params }: PageProps) {
                   <div className="return-detail__field">
                     <span className="return-detail__label">Decision Date</span>
                     <span className="return-detail__value">
-                      {returnItem.decidedAt}
+                      {new Date(returnItem.decidedAt).toLocaleDateString()}
                     </span>
                   </div>
                 )}
@@ -324,6 +352,37 @@ export default function ReturnDetailPage({ params }: PageProps) {
                 </div>
               </div>
             </div>
+
+            {/* Audit Logs */}
+            {returnItem.auditLogs && returnItem.auditLogs.length > 0 && (
+              <div className="return-detail__card" style={{ marginTop: "20px" }}>
+                <h3 className="return-detail__card-title">Audit History</h3>
+                <div className="recent-returns__table-wrapper">
+                  <table className="recent-returns__table">
+                    <thead>
+                      <tr>
+                        <th>Action</th>
+                        <th>Actor</th>
+                        <th>Reason</th>
+                        <th>Date</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {returnItem.auditLogs.map((log) => (
+                        <tr key={log.id}>
+                          <td><strong>{log.action}</strong></td>
+                          <td>{log.actor}</td>
+                          <td className={log.reason ? "" : "return-detail__value--muted"}>
+                            {log.reason || "—"}
+                          </td>
+                          <td>{new Date(log.createdAt).toLocaleString()}</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            )}
 
             {/* Bottom Actions */}
             <div className="return-detail__actions">
