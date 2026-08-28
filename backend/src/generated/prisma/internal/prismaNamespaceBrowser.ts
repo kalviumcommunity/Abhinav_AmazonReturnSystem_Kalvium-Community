@@ -90,6 +90,7 @@ export const ReturnRequestScalarFieldEnum = {
   product: 'product',
   customer: 'customer',
   status: 'status',
+  sellerId: 'sellerId',
   decidedBy: 'decidedBy',
   decidedAt: 'decidedAt',
   rejectionReason: 'rejectionReason',

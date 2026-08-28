@@ -21,7 +21,7 @@ export type ReturnStatus = (typeof ReturnStatus)[keyof typeof ReturnStatus]
 
 export const UserRole = {
   SELLER: 'SELLER',
-  ADMIN: 'ADMIN'
+  CUSTOMER_SUPPORT: 'CUSTOMER_SUPPORT'
 } as const
 
 export type UserRole = (typeof UserRole)[keyof typeof UserRole]

@@ -30,6 +30,7 @@ export type ReturnRequestMinAggregateOutputType = {
   product: string | null
   customer: string | null
   status: $Enums.ReturnStatus | null
+  sellerId: string | null
   decidedBy: string | null
   decidedAt: Date | null
   rejectionReason: string | null
@@ -43,6 +44,7 @@ export type ReturnRequestMaxAggregateOutputType = {
   product: string | null
   customer: string | null
   status: $Enums.ReturnStatus | null
+  sellerId: string | null
   decidedBy: string | null
   decidedAt: Date | null
   rejectionReason: string | null
@@ -56,6 +58,7 @@ export type ReturnRequestCountAggregateOutputType = {
   product: number
   customer: number
   status: number
+  sellerId: number
   decidedBy: number
   decidedAt: number
   rejectionReason: number
@@ -71,6 +74,7 @@ export type ReturnRequestMinAggregateInputType = {
   product?: true
   customer?: true
   status?: true
+  sellerId?: true
   decidedBy?: true
   decidedAt?: true
   rejectionReason?: true
@@ -84,6 +88,7 @@ export type ReturnRequestMaxAggregateInputType = {
   product?: true
   customer?: true
   status?: true
+  sellerId?: true
   decidedBy?: true
   decidedAt?: true
   rejectionReason?: true
@@ -97,6 +102,7 @@ export type ReturnRequestCountAggregateInputType = {
   product?: true
   customer?: true
   status?: true
+  sellerId?: true
   decidedBy?: true
   decidedAt?: true
   rejectionReason?: true
@@ -183,6 +189,7 @@ export type ReturnRequestGroupByOutputType = {
   product: string | null
   customer: string | null
   status: $Enums.ReturnStatus
+  sellerId: string | null
   decidedBy: string | null
   decidedAt: Date | null
   rejectionReason: string | null
@@ -217,11 +224,13 @@ export type ReturnRequestWhereInput = {
   product?: Prisma.StringNullableFilter<"ReturnRequest"> | string | null
   customer?: Prisma.StringNullableFilter<"ReturnRequest"> | string | null
   status?: Prisma.EnumReturnStatusFilter<"ReturnRequest"> | $Enums.ReturnStatus
+  sellerId?: Prisma.StringNullableFilter<"ReturnRequest"> | string | null
   decidedBy?: Prisma.StringNullableFilter<"ReturnRequest"> | string | null
   decidedAt?: Prisma.DateTimeNullableFilter<"ReturnRequest"> | Date | string | null
   rejectionReason?: Prisma.StringNullableFilter<"ReturnRequest"> | string | null
   createdAt?: Prisma.DateTimeFilter<"ReturnRequest"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"ReturnRequest"> | Date | string
+  seller?: Prisma.XOR<Prisma.UserNullableScalarRelationFilter, Prisma.UserWhereInput> | null
   auditLogs?: Prisma.AuditLogListRelationFilter
 }
 
@@ -231,11 +240,13 @@ export type ReturnRequestOrderByWithRelationInput = {
   product?: Prisma.SortOrderInput | Prisma.SortOrder
   customer?: Prisma.SortOrderInput | Prisma.SortOrder
   status?: Prisma.SortOrder
+  sellerId?: Prisma.SortOrderInput | Prisma.SortOrder
   decidedBy?: Prisma.SortOrderInput | Prisma.SortOrder
   decidedAt?: Prisma.SortOrderInput | Prisma.SortOrder
   rejectionReason?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
+  seller?: Prisma.UserOrderByWithRelationInput
   auditLogs?: Prisma.AuditLogOrderByRelationAggregateInput
 }
 
@@ -248,11 +259,13 @@ export type ReturnRequestWhereUniqueInput = Prisma.AtLeast<{
   product?: Prisma.StringNullableFilter<"ReturnRequest"> | string | null
   customer?: Prisma.StringNullableFilter<"ReturnRequest"> | string | null
   status?: Prisma.EnumReturnStatusFilter<"ReturnRequest"> | $Enums.ReturnStatus
+  sellerId?: Prisma.StringNullableFilter<"ReturnRequest"> | string | null
   decidedBy?: Prisma.StringNullableFilter<"ReturnRequest"> | string | null
   decidedAt?: Prisma.DateTimeNullableFilter<"ReturnRequest"> | Date | string | null
   rejectionReason?: Prisma.StringNullableFilter<"ReturnRequest"> | string | null
   createdAt?: Prisma.DateTimeFilter<"ReturnRequest"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"ReturnRequest"> | Date | string
+  seller?: Prisma.XOR<Prisma.UserNullableScalarRelationFilter, Prisma.UserWhereInput> | null
   auditLogs?: Prisma.AuditLogListRelationFilter
 }, "id">
 
@@ -262,6 +275,7 @@ export type ReturnRequestOrderByWithAggregationInput = {
   product?: Prisma.SortOrderInput | Prisma.SortOrder
   customer?: Prisma.SortOrderInput | Prisma.SortOrder
   status?: Prisma.SortOrder
+  sellerId?: Prisma.SortOrderInput | Prisma.SortOrder
   decidedBy?: Prisma.SortOrderInput | Prisma.SortOrder
   decidedAt?: Prisma.SortOrderInput | Prisma.SortOrder
   rejectionReason?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -281,6 +295,7 @@ export type ReturnRequestScalarWhereWithAggregatesInput = {
   product?: Prisma.StringNullableWithAggregatesFilter<"ReturnRequest"> | string | null
   customer?: Prisma.StringNullableWithAggregatesFilter<"ReturnRequest"> | string | null
   status?: Prisma.EnumReturnStatusWithAggregatesFilter<"ReturnRequest"> | $Enums.ReturnStatus
+  sellerId?: Prisma.StringNullableWithAggregatesFilter<"ReturnRequest"> | string | null
   decidedBy?: Prisma.StringNullableWithAggregatesFilter<"ReturnRequest"> | string | null
   decidedAt?: Prisma.DateTimeNullableWithAggregatesFilter<"ReturnRequest"> | Date | string | null
   rejectionReason?: Prisma.StringNullableWithAggregatesFilter<"ReturnRequest"> | string | null
@@ -299,6 +314,7 @@ export type ReturnRequestCreateInput = {
   rejectionReason?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
+  seller?: Prisma.UserCreateNestedOneWithoutReturnRequestsInput
   auditLogs?: Prisma.AuditLogCreateNestedManyWithoutReturnRequestInput
 }
 
@@ -308,6 +324,7 @@ export type ReturnRequestUncheckedCreateInput = {
   product?: string | null
   customer?: string | null
   status?: $Enums.ReturnStatus
+  sellerId?: string | null
   decidedBy?: string | null
   decidedAt?: Date | string | null
   rejectionReason?: string | null
@@ -327,6 +344,7 @@ export type ReturnRequestUpdateInput = {
   rejectionReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  seller?: Prisma.UserUpdateOneWithoutReturnRequestsNestedInput
   auditLogs?: Prisma.AuditLogUpdateManyWithoutReturnRequestNestedInput
 }
 
@@ -336,6 +354,7 @@ export type ReturnRequestUncheckedUpdateInput = {
   product?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   customer?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   status?: Prisma.EnumReturnStatusFieldUpdateOperationsInput | $Enums.ReturnStatus
+  sellerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   decidedBy?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   decidedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   rejectionReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -350,6 +369,7 @@ export type ReturnRequestCreateManyInput = {
   product?: string | null
   customer?: string | null
   status?: $Enums.ReturnStatus
+  sellerId?: string | null
   decidedBy?: string | null
   decidedAt?: Date | string | null
   rejectionReason?: string | null
@@ -376,11 +396,22 @@ export type ReturnRequestUncheckedUpdateManyInput = {
   product?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   customer?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   status?: Prisma.EnumReturnStatusFieldUpdateOperationsInput | $Enums.ReturnStatus
+  sellerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   decidedBy?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   decidedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   rejectionReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+}
+
+export type ReturnRequestListRelationFilter = {
+  every?: Prisma.ReturnRequestWhereInput
+  some?: Prisma.ReturnRequestWhereInput
+  none?: Prisma.ReturnRequestWhereInput
+}
+
+export type ReturnRequestOrderByRelationAggregateInput = {
+  _count?: Prisma.SortOrder
 }
 
 export type ReturnRequestCountOrderByAggregateInput = {
@@ -389,6 +420,7 @@ export type ReturnRequestCountOrderByAggregateInput = {
   product?: Prisma.SortOrder
   customer?: Prisma.SortOrder
   status?: Prisma.SortOrder
+  sellerId?: Prisma.SortOrder
   decidedBy?: Prisma.SortOrder
   decidedAt?: Prisma.SortOrder
   rejectionReason?: Prisma.SortOrder
@@ -402,6 +434,7 @@ export type ReturnRequestMaxOrderByAggregateInput = {
   product?: Prisma.SortOrder
   customer?: Prisma.SortOrder
   status?: Prisma.SortOrder
+  sellerId?: Prisma.SortOrder
   decidedBy?: Prisma.SortOrder
   decidedAt?: Prisma.SortOrder
   rejectionReason?: Prisma.SortOrder
@@ -415,6 +448,7 @@ export type ReturnRequestMinOrderByAggregateInput = {
   product?: Prisma.SortOrder
   customer?: Prisma.SortOrder
   status?: Prisma.SortOrder
+  sellerId?: Prisma.SortOrder
   decidedBy?: Prisma.SortOrder
   decidedAt?: Prisma.SortOrder
   rejectionReason?: Prisma.SortOrder
@@ -425,6 +459,48 @@ export type ReturnRequestMinOrderByAggregateInput = {
 export type ReturnRequestNullableScalarRelationFilter = {
   is?: Prisma.ReturnRequestWhereInput | null
   isNot?: Prisma.ReturnRequestWhereInput | null
+}
+
+export type ReturnRequestCreateNestedManyWithoutSellerInput = {
+  create?: Prisma.XOR<Prisma.ReturnRequestCreateWithoutSellerInput, Prisma.ReturnRequestUncheckedCreateWithoutSellerInput> | Prisma.ReturnRequestCreateWithoutSellerInput[] | Prisma.ReturnRequestUncheckedCreateWithoutSellerInput[]
+  connectOrCreate?: Prisma.ReturnRequestCreateOrConnectWithoutSellerInput | Prisma.ReturnRequestCreateOrConnectWithoutSellerInput[]
+  createMany?: Prisma.ReturnRequestCreateManySellerInputEnvelope
+  connect?: Prisma.ReturnRequestWhereUniqueInput | Prisma.ReturnRequestWhereUniqueInput[]
+}
+
+export type ReturnRequestUncheckedCreateNestedManyWithoutSellerInput = {
+  create?: Prisma.XOR<Prisma.ReturnRequestCreateWithoutSellerInput, Prisma.ReturnRequestUncheckedCreateWithoutSellerInput> | Prisma.ReturnRequestCreateWithoutSellerInput[] | Prisma.ReturnRequestUncheckedCreateWithoutSellerInput[]
+  connectOrCreate?: Prisma.ReturnRequestCreateOrConnectWithoutSellerInput | Prisma.ReturnRequestCreateOrConnectWithoutSellerInput[]
+  createMany?: Prisma.ReturnRequestCreateManySellerInputEnvelope
+  connect?: Prisma.ReturnRequestWhereUniqueInput | Prisma.ReturnRequestWhereUniqueInput[]
+}
+
+export type ReturnRequestUpdateManyWithoutSellerNestedInput = {
+  create?: Prisma.XOR<Prisma.ReturnRequestCreateWithoutSellerInput, Prisma.ReturnRequestUncheckedCreateWithoutSellerInput> | Prisma.ReturnRequestCreateWithoutSellerInput[] | Prisma.ReturnRequestUncheckedCreateWithoutSellerInput[]
+  connectOrCreate?: Prisma.ReturnRequestCreateOrConnectWithoutSellerInput | Prisma.ReturnRequestCreateOrConnectWithoutSellerInput[]
+  upsert?: Prisma.ReturnRequestUpsertWithWhereUniqueWithoutSellerInput | Prisma.ReturnRequestUpsertWithWhereUniqueWithoutSellerInput[]
+  createMany?: Prisma.ReturnRequestCreateManySellerInputEnvelope
+  set?: Prisma.ReturnRequestWhereUniqueInput | Prisma.ReturnRequestWhereUniqueInput[]
+  disconnect?: Prisma.ReturnRequestWhereUniqueInput | Prisma.ReturnRequestWhereUniqueInput[]
+  delete?: Prisma.ReturnRequestWhereUniqueInput | Prisma.ReturnRequestWhereUniqueInput[]
+  connect?: Prisma.ReturnRequestWhereUniqueInput | Prisma.ReturnRequestWhereUniqueInput[]
+  update?: Prisma.ReturnRequestUpdateWithWhereUniqueWithoutSellerInput | Prisma.ReturnRequestUpdateWithWhereUniqueWithoutSellerInput[]
+  updateMany?: Prisma.ReturnRequestUpdateManyWithWhereWithoutSellerInput | Prisma.ReturnRequestUpdateManyWithWhereWithoutSellerInput[]
+  deleteMany?: Prisma.ReturnRequestScalarWhereInput | Prisma.ReturnRequestScalarWhereInput[]
+}
+
+export type ReturnRequestUncheckedUpdateManyWithoutSellerNestedInput = {
+  create?: Prisma.XOR<Prisma.ReturnRequestCreateWithoutSellerInput, Prisma.ReturnRequestUncheckedCreateWithoutSellerInput> | Prisma.ReturnRequestCreateWithoutSellerInput[] | Prisma.ReturnRequestUncheckedCreateWithoutSellerInput[]
+  connectOrCreate?: Prisma.ReturnRequestCreateOrConnectWithoutSellerInput | Prisma.ReturnRequestCreateOrConnectWithoutSellerInput[]
+  upsert?: Prisma.ReturnRequestUpsertWithWhereUniqueWithoutSellerInput | Prisma.ReturnRequestUpsertWithWhereUniqueWithoutSellerInput[]
+  createMany?: Prisma.ReturnRequestCreateManySellerInputEnvelope
+  set?: Prisma.ReturnRequestWhereUniqueInput | Prisma.ReturnRequestWhereUniqueInput[]
+  disconnect?: Prisma.ReturnRequestWhereUniqueInput | Prisma.ReturnRequestWhereUniqueInput[]
+  delete?: Prisma.ReturnRequestWhereUniqueInput | Prisma.ReturnRequestWhereUniqueInput[]
+  connect?: Prisma.ReturnRequestWhereUniqueInput | Prisma.ReturnRequestWhereUniqueInput[]
+  update?: Prisma.ReturnRequestUpdateWithWhereUniqueWithoutSellerInput | Prisma.ReturnRequestUpdateWithWhereUniqueWithoutSellerInput[]
+  updateMany?: Prisma.ReturnRequestUpdateManyWithWhereWithoutSellerInput | Prisma.ReturnRequestUpdateManyWithWhereWithoutSellerInput[]
+  deleteMany?: Prisma.ReturnRequestScalarWhereInput | Prisma.ReturnRequestScalarWhereInput[]
 }
 
 export type EnumReturnStatusFieldUpdateOperationsInput = {
@@ -451,6 +527,77 @@ export type ReturnRequestUpdateOneWithoutAuditLogsNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.ReturnRequestUpdateToOneWithWhereWithoutAuditLogsInput, Prisma.ReturnRequestUpdateWithoutAuditLogsInput>, Prisma.ReturnRequestUncheckedUpdateWithoutAuditLogsInput>
 }
 
+export type ReturnRequestCreateWithoutSellerInput = {
+  id?: string
+  orderId?: string | null
+  product?: string | null
+  customer?: string | null
+  status?: $Enums.ReturnStatus
+  decidedBy?: string | null
+  decidedAt?: Date | string | null
+  rejectionReason?: string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  auditLogs?: Prisma.AuditLogCreateNestedManyWithoutReturnRequestInput
+}
+
+export type ReturnRequestUncheckedCreateWithoutSellerInput = {
+  id?: string
+  orderId?: string | null
+  product?: string | null
+  customer?: string | null
+  status?: $Enums.ReturnStatus
+  decidedBy?: string | null
+  decidedAt?: Date | string | null
+  rejectionReason?: string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  auditLogs?: Prisma.AuditLogUncheckedCreateNestedManyWithoutReturnRequestInput
+}
+
+export type ReturnRequestCreateOrConnectWithoutSellerInput = {
+  where: Prisma.ReturnRequestWhereUniqueInput
+  create: Prisma.XOR<Prisma.ReturnRequestCreateWithoutSellerInput, Prisma.ReturnRequestUncheckedCreateWithoutSellerInput>
+}
+
+export type ReturnRequestCreateManySellerInputEnvelope = {
+  data: Prisma.ReturnRequestCreateManySellerInput | Prisma.ReturnRequestCreateManySellerInput[]
+  skipDuplicates?: boolean
+}
+
+export type ReturnRequestUpsertWithWhereUniqueWithoutSellerInput = {
+  where: Prisma.ReturnRequestWhereUniqueInput
+  update: Prisma.XOR<Prisma.ReturnRequestUpdateWithoutSellerInput, Prisma.ReturnRequestUncheckedUpdateWithoutSellerInput>
+  create: Prisma.XOR<Prisma.ReturnRequestCreateWithoutSellerInput, Prisma.ReturnRequestUncheckedCreateWithoutSellerInput>
+}
+
+export type ReturnRequestUpdateWithWhereUniqueWithoutSellerInput = {
+  where: Prisma.ReturnRequestWhereUniqueInput
+  data: Prisma.XOR<Prisma.ReturnRequestUpdateWithoutSellerInput, Prisma.ReturnRequestUncheckedUpdateWithoutSellerInput>
+}
+
+export type ReturnRequestUpdateManyWithWhereWithoutSellerInput = {
+  where: Prisma.ReturnRequestScalarWhereInput
+  data: Prisma.XOR<Prisma.ReturnRequestUpdateManyMutationInput, Prisma.ReturnRequestUncheckedUpdateManyWithoutSellerInput>
+}
+
+export type ReturnRequestScalarWhereInput = {
+  AND?: Prisma.ReturnRequestScalarWhereInput | Prisma.ReturnRequestScalarWhereInput[]
+  OR?: Prisma.ReturnRequestScalarWhereInput[]
+  NOT?: Prisma.ReturnRequestScalarWhereInput | Prisma.ReturnRequestScalarWhereInput[]
+  id?: Prisma.StringFilter<"ReturnRequest"> | string
+  orderId?: Prisma.StringNullableFilter<"ReturnRequest"> | string | null
+  product?: Prisma.StringNullableFilter<"ReturnRequest"> | string | null
+  customer?: Prisma.StringNullableFilter<"ReturnRequest"> | string | null
+  status?: Prisma.EnumReturnStatusFilter<"ReturnRequest"> | $Enums.ReturnStatus
+  sellerId?: Prisma.StringNullableFilter<"ReturnRequest"> | string | null
+  decidedBy?: Prisma.StringNullableFilter<"ReturnRequest"> | string | null
+  decidedAt?: Prisma.DateTimeNullableFilter<"ReturnRequest"> | Date | string | null
+  rejectionReason?: Prisma.StringNullableFilter<"ReturnRequest"> | string | null
+  createdAt?: Prisma.DateTimeFilter<"ReturnRequest"> | Date | string
+  updatedAt?: Prisma.DateTimeFilter<"ReturnRequest"> | Date | string
+}
+
 export type ReturnRequestCreateWithoutAuditLogsInput = {
   id?: string
   orderId?: string | null
@@ -462,6 +609,7 @@ export type ReturnRequestCreateWithoutAuditLogsInput = {
   rejectionReason?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
+  seller?: Prisma.UserCreateNestedOneWithoutReturnRequestsInput
 }
 
 export type ReturnRequestUncheckedCreateWithoutAuditLogsInput = {
@@ -470,6 +618,7 @@ export type ReturnRequestUncheckedCreateWithoutAuditLogsInput = {
   product?: string | null
   customer?: string | null
   status?: $Enums.ReturnStatus
+  sellerId?: string | null
   decidedBy?: string | null
   decidedAt?: Date | string | null
   rejectionReason?: string | null
@@ -504,9 +653,65 @@ export type ReturnRequestUpdateWithoutAuditLogsInput = {
   rejectionReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  seller?: Prisma.UserUpdateOneWithoutReturnRequestsNestedInput
 }
 
 export type ReturnRequestUncheckedUpdateWithoutAuditLogsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  orderId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  product?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  customer?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  status?: Prisma.EnumReturnStatusFieldUpdateOperationsInput | $Enums.ReturnStatus
+  sellerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  decidedBy?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  decidedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  rejectionReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+}
+
+export type ReturnRequestCreateManySellerInput = {
+  id?: string
+  orderId?: string | null
+  product?: string | null
+  customer?: string | null
+  status?: $Enums.ReturnStatus
+  decidedBy?: string | null
+  decidedAt?: Date | string | null
+  rejectionReason?: string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+}
+
+export type ReturnRequestUpdateWithoutSellerInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  orderId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  product?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  customer?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  status?: Prisma.EnumReturnStatusFieldUpdateOperationsInput | $Enums.ReturnStatus
+  decidedBy?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  decidedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  rejectionReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  auditLogs?: Prisma.AuditLogUpdateManyWithoutReturnRequestNestedInput
+}
+
+export type ReturnRequestUncheckedUpdateWithoutSellerInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  orderId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  product?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  customer?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  status?: Prisma.EnumReturnStatusFieldUpdateOperationsInput | $Enums.ReturnStatus
+  decidedBy?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  decidedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  rejectionReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  auditLogs?: Prisma.AuditLogUncheckedUpdateManyWithoutReturnRequestNestedInput
+}
+
+export type ReturnRequestUncheckedUpdateManyWithoutSellerInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   orderId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   product?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -556,11 +761,13 @@ export type ReturnRequestSelect<ExtArgs extends runtime.Types.Extensions.Interna
   product?: boolean
   customer?: boolean
   status?: boolean
+  sellerId?: boolean
   decidedBy?: boolean
   decidedAt?: boolean
   rejectionReason?: boolean
   createdAt?: boolean
   updatedAt?: boolean
+  seller?: boolean | Prisma.ReturnRequest$sellerArgs<ExtArgs>
   auditLogs?: boolean | Prisma.ReturnRequest$auditLogsArgs<ExtArgs>
   _count?: boolean | Prisma.ReturnRequestCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["returnRequest"]>
@@ -571,11 +778,13 @@ export type ReturnRequestSelectCreateManyAndReturn<ExtArgs extends runtime.Types
   product?: boolean
   customer?: boolean
   status?: boolean
+  sellerId?: boolean
   decidedBy?: boolean
   decidedAt?: boolean
   rejectionReason?: boolean
   createdAt?: boolean
   updatedAt?: boolean
+  seller?: boolean | Prisma.ReturnRequest$sellerArgs<ExtArgs>
 }, ExtArgs["result"]["returnRequest"]>
 
 export type ReturnRequestSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
@@ -584,11 +793,13 @@ export type ReturnRequestSelectUpdateManyAndReturn<ExtArgs extends runtime.Types
   product?: boolean
   customer?: boolean
   status?: boolean
+  sellerId?: boolean
   decidedBy?: boolean
   decidedAt?: boolean
   rejectionReason?: boolean
   createdAt?: boolean
   updatedAt?: boolean
+  seller?: boolean | Prisma.ReturnRequest$sellerArgs<ExtArgs>
 }, ExtArgs["result"]["returnRequest"]>
 
 export type ReturnRequestSelectScalar = {
@@ -597,6 +808,7 @@ export type ReturnRequestSelectScalar = {
   product?: boolean
   customer?: boolean
   status?: boolean
+  sellerId?: boolean
   decidedBy?: boolean
   decidedAt?: boolean
   rejectionReason?: boolean
@@ -604,17 +816,23 @@ export type ReturnRequestSelectScalar = {
   updatedAt?: boolean
 }
 
-export type ReturnRequestOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "orderId" | "product" | "customer" | "status" | "decidedBy" | "decidedAt" | "rejectionReason" | "createdAt" | "updatedAt", ExtArgs["result"]["returnRequest"]>
+export type ReturnRequestOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "orderId" | "product" | "customer" | "status" | "sellerId" | "decidedBy" | "decidedAt" | "rejectionReason" | "createdAt" | "updatedAt", ExtArgs["result"]["returnRequest"]>
 export type ReturnRequestInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  seller?: boolean | Prisma.ReturnRequest$sellerArgs<ExtArgs>
   auditLogs?: boolean | Prisma.ReturnRequest$auditLogsArgs<ExtArgs>
   _count?: boolean | Prisma.ReturnRequestCountOutputTypeDefaultArgs<ExtArgs>
 }
-export type ReturnRequestIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {}
-export type ReturnRequestIncludeUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {}
+export type ReturnRequestIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  seller?: boolean | Prisma.ReturnRequest$sellerArgs<ExtArgs>
+}
+export type ReturnRequestIncludeUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  seller?: boolean | Prisma.ReturnRequest$sellerArgs<ExtArgs>
+}
 
 export type $ReturnRequestPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   name: "ReturnRequest"
   objects: {
+    seller: Prisma.$UserPayload<ExtArgs> | null
     auditLogs: Prisma.$AuditLogPayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
@@ -623,6 +841,7 @@ export type $ReturnRequestPayload<ExtArgs extends runtime.Types.Extensions.Inter
     product: string | null
     customer: string | null
     status: $Enums.ReturnStatus
+    sellerId: string | null
     decidedBy: string | null
     decidedAt: Date | null
     rejectionReason: string | null
@@ -1022,6 +1241,7 @@ readonly fields: ReturnRequestFieldRefs;
  */
 export interface Prisma__ReturnRequestClient<T, Null = never, ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
   readonly [Symbol.toStringTag]: "PrismaPromise"
+  seller<T extends Prisma.ReturnRequest$sellerArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.ReturnRequest$sellerArgs<ExtArgs>>): Prisma.Prisma__UserClient<runtime.Types.Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   auditLogs<T extends Prisma.ReturnRequest$auditLogsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.ReturnRequest$auditLogsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$AuditLogPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
@@ -1057,6 +1277,7 @@ export interface ReturnRequestFieldRefs {
   readonly product: Prisma.FieldRef<"ReturnRequest", 'String'>
   readonly customer: Prisma.FieldRef<"ReturnRequest", 'String'>
   readonly status: Prisma.FieldRef<"ReturnRequest", 'ReturnStatus'>
+  readonly sellerId: Prisma.FieldRef<"ReturnRequest", 'String'>
   readonly decidedBy: Prisma.FieldRef<"ReturnRequest", 'String'>
   readonly decidedAt: Prisma.FieldRef<"ReturnRequest", 'DateTime'>
   readonly rejectionReason: Prisma.FieldRef<"ReturnRequest", 'String'>
@@ -1316,6 +1537,10 @@ export type ReturnRequestCreateManyAndReturnArgs<ExtArgs extends runtime.Types.E
    */
   data: Prisma.ReturnRequestCreateManyInput | Prisma.ReturnRequestCreateManyInput[]
   skipDuplicates?: boolean
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.ReturnRequestIncludeCreateManyAndReturn<ExtArgs> | null
 }
 
 /**
@@ -1386,6 +1611,10 @@ export type ReturnRequestUpdateManyAndReturnArgs<ExtArgs extends runtime.Types.E
    * Limit how many ReturnRequests to update.
    */
   limit?: number
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.ReturnRequestIncludeUpdateManyAndReturn<ExtArgs> | null
 }
 
 /**
@@ -1452,6 +1681,25 @@ export type ReturnRequestDeleteManyArgs<ExtArgs extends runtime.Types.Extensions
    * Limit how many ReturnRequests to delete.
    */
   limit?: number
+}
+
+/**
+ * ReturnRequest.seller
+ */
+export type ReturnRequest$sellerArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the User
+   */
+  select?: Prisma.UserSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the User
+   */
+  omit?: Prisma.UserOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.UserInclude<ExtArgs> | null
+  where?: Prisma.UserWhereInput
 }
 
 /**
