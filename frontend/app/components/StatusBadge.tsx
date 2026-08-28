@@ -1,20 +1,21 @@
-import { ReturnRequest } from "@/app/data/mockData";
+import { ReturnStatus, statusDisplayLabel } from "@/app/types";
 
-const statusConfig: Record<ReturnRequest["status"], { className: string }> = {
-  Pending: { className: "badge--pending" },
-  Approved: { className: "badge--approved" },
-  Rejected: { className: "badge--rejected" },
-  "Auto Approved": { className: "badge--auto-approved" },
+const statusConfig: Record<ReturnStatus, { className: string }> = {
+  PENDING: { className: "badge--pending" },
+  APPROVED: { className: "badge--approved" },
+  REJECTED: { className: "badge--rejected" },
+  AUTO_APPROVED: { className: "badge--auto-approved" },
 };
 
 interface StatusBadgeProps {
-  status: ReturnRequest["status"];
+  status: ReturnStatus;
 }
 
 export default function StatusBadge({ status }: StatusBadgeProps) {
+  const config = statusConfig[status] || { className: "badge--pending" };
   return (
-    <span className={`badge ${statusConfig[status].className}`}>
-      {status}
+    <span className={`badge ${config.className}`}>
+      {statusDisplayLabel[status] || status}
     </span>
   );
 }

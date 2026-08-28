@@ -1,16 +1,18 @@
 "use client";
 
-import { useState, useMemo, Suspense } from "react";
+import { useState, useEffect, useMemo, Suspense } from "react";
 import { useSearchParams } from "next/navigation";
 import Link from "next/link";
 import TopNav from "@/app/components/TopNav";
 import Sidebar from "@/app/components/Sidebar";
 import StatusBadge from "@/app/components/StatusBadge";
+import { getAllReturns } from "@/app/services/returnsService";
 import {
-  allReturnRequests,
-  statusFilters,
+  ReturnRequest,
   ReturnStatus,
-} from "@/app/data/mockData";
+  statusFilters,
+  statusDisplayLabel,
+} from "@/app/types";
 
 type FilterValue = "All" | ReturnStatus;
 
@@ -18,13 +20,32 @@ function ReturnsContent() {
   const searchParams = useSearchParams();
   const initialStatus = (searchParams.get("status") as ReturnStatus) || "All";
 
+  const [allReturns, setAllReturns] = useState<ReturnRequest[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
   const [activeFilter, setActiveFilter] = useState<FilterValue>(
     statusFilters.includes(initialStatus as FilterValue) ? initialStatus : "All"
   );
 
+  useEffect(() => {
+    async function loadData() {
+      setLoading(true);
+      setError(null);
+      try {
+        const data = await getAllReturns();
+        setAllReturns(data);
+      } catch (err: any) {
+        setError(err.message || "Failed to load return requests.");
+      } finally {
+        setLoading(false);
+      }
+    }
+    loadData();
+  }, []);
+
   const filteredReturns = useMemo(() => {
-    let results = allReturnRequests;
+    let results = allReturns;
 
     // Filter by status
     if (activeFilter !== "All") {
@@ -44,15 +65,37 @@ function ReturnsContent() {
     }
 
     return results;
-  }, [searchQuery, activeFilter]);
+  }, [allReturns, searchQuery, activeFilter]);
 
   const filterCounts = useMemo(() => {
-    const counts: Record<string, number> = { All: allReturnRequests.length };
-    for (const r of allReturnRequests) {
+    const counts: Record<string, number> = { All: allReturns.length };
+    for (const r of allReturns) {
       counts[r.status] = (counts[r.status] || 0) + 1;
     }
     return counts;
-  }, []);
+  }, [allReturns]);
+
+  if (loading) {
+    return (
+      <main className="dashboard-main">
+        <div className="returns-loading">
+          <div className="returns-loading__spinner" />
+          <p>Loading return requests...</p>
+        </div>
+      </main>
+    );
+  }
+
+  if (error) {
+    return (
+      <main className="dashboard-main">
+        <div className="return-detail__not-found">
+          <h1>Error</h1>
+          <p>{error}</p>
+        </div>
+      </main>
+    );
+  }
 
   return (
     <main className="dashboard-main">
@@ -97,7 +140,7 @@ function ReturnsContent() {
               }`}
               onClick={() => setActiveFilter(filter)}
             >
-              {filter}
+              {filter === "All" ? "All" : statusDisplayLabel[filter]}
               <span className="returns-filters__count">
                 {filterCounts[filter] ?? 0}
               </span>
@@ -110,7 +153,7 @@ function ReturnsContent() {
       <div className="returns-results-info">
         <span>
           Showing <strong>{filteredReturns.length}</strong> of{" "}
-          <strong>{allReturnRequests.length}</strong> return requests
+          <strong>{allReturns.length}</strong> return requests
         </span>
       </div>
 
@@ -137,7 +180,7 @@ function ReturnsContent() {
                     <td className="returns-table__order-id">{item.orderId}</td>
                     <td>{item.product}</td>
                     <td>{item.customer}</td>
-                    <td>{item.requested}</td>
+                    <td>{new Date(item.createdAt).toLocaleDateString()}</td>
                     <td>
                       <StatusBadge status={item.status} />
                     </td>

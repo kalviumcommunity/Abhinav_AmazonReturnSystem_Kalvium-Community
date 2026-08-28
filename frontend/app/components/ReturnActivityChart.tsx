@@ -1,6 +1,6 @@
 "use client";
 
-import { DailyActivity } from "@/app/data/mockData";
+import { DailyActivity } from "@/app/types";
 
 interface ReturnActivityChartProps {
   data: DailyActivity[];

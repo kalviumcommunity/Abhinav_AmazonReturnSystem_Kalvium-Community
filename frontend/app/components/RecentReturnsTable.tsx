@@ -1,4 +1,4 @@
-import { ReturnRequest } from "@/app/data/mockData";
+import { ReturnRequest } from "@/app/types";
 import StatusBadge from "@/app/components/StatusBadge";
 import Link from "next/link";
 
@@ -30,7 +30,7 @@ export default function RecentReturnsTable({ returns }: RecentReturnsTableProps)
                 <td className="recent-returns__id">{item.id}</td>
                 <td>{item.product}</td>
                 <td>{item.customer}</td>
-                <td>{item.requested}</td>
+                <td>{new Date(item.createdAt).toLocaleDateString()}</td>
                 <td>
                   <StatusBadge status={item.status} />
                 </td>
@@ -42,3 +42,4 @@ export default function RecentReturnsTable({ returns }: RecentReturnsTableProps)
     </div>
   );
 }
+
