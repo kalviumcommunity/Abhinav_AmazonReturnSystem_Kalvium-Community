@@ -158,7 +158,7 @@ export default function DashboardPage() {
               {/* Activity + Quick Actions */}
               <div className="dashboard-middle">
                 <ReturnActivityChart data={weeklyActivity} />
-                <QuickActions />
+                <QuickActions pendingCount={summaryCards[0].value as number} />
               </div>
 
               {/* Recent Returns Table */}

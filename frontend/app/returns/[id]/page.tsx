@@ -161,6 +161,14 @@ export default function ReturnDetailPage({ params }: PageProps) {
 
   const isPending = returnItem.status === "PENDING";
 
+  // Calculate Auto-Approval Countdown
+  const createdAtDate = new Date(returnItem.createdAt);
+  const autoApproveDate = new Date(createdAtDate.getTime() + 48 * 60 * 60 * 1000);
+  const now = new Date();
+  const timeRemainingMs = autoApproveDate.getTime() - now.getTime();
+  const hoursRemaining = Math.max(0, Math.floor(timeRemainingMs / (1000 * 60 * 60)));
+  const isExpired = timeRemainingMs <= 0;
+
   return (
     <div className="dashboard-layout">
       <TopNav />
@@ -223,21 +231,30 @@ export default function ReturnDetailPage({ params }: PageProps) {
 
               {/* Action Buttons for Pending items */}
               {isPending ? (
-                <div className="decision-actions">
-                  <button
-                    type="button"
-                    onClick={handleOpenReject}
-                    className="decision-btn decision-btn--reject"
-                  >
-                    <span className="decision-btn__icon">✕</span> Reject Request
-                  </button>
-                  <button
-                    type="button"
-                    onClick={handleOpenApprove}
-                    className="decision-btn decision-btn--approve"
-                  >
-                    <span className="decision-btn__icon">✓</span> Approve Request
-                  </button>
+                <div className="decision-actions-container">
+                  <div className="decision-actions">
+                    <button
+                      type="button"
+                      onClick={handleOpenReject}
+                      className="decision-btn decision-btn--reject"
+                    >
+                      <span className="decision-btn__icon">✕</span> Reject Request
+                    </button>
+                    <button
+                      type="button"
+                      onClick={handleOpenApprove}
+                      className="decision-btn decision-btn--approve"
+                    >
+                      <span className="decision-btn__icon">✓</span> Approve Request
+                    </button>
+                  </div>
+                  
+                  <div className="auto-approve-countdown" style={{ marginTop: '16px', padding: '12px', backgroundColor: '#fff3cd', borderLeft: '4px solid #ffc107', borderRadius: '4px' }}>
+                    <strong>⏳ Auto-Approval Status:</strong> 
+                    {isExpired 
+                      ? ' Processing auto-approval (48 hours elapsed).'
+                      : ` This return will automatically approve in ${hoursRemaining} hours if no action is taken.`}
+                  </div>
                 </div>
               ) : (
                 <div className="decision-locked-badge">
@@ -266,10 +283,15 @@ export default function ReturnDetailPage({ params }: PageProps) {
                     <strong>{statusDisplayLabel[returnItem.status]}</strong>
                   </h4>
                   <p className="decision-callout__meta">
-                    Decided by: {returnItem.decidedBy || "System Policy"}
+                    Decided by: {returnItem.status === "AUTO_APPROVED" ? "System" : returnItem.decidedBy || "System Policy"}
                     {returnItem.decidedAt &&
                       ` on ${new Date(returnItem.decidedAt).toLocaleDateString()}`}
                   </p>
+                  {returnItem.status === "AUTO_APPROVED" && (
+                    <div className="decision-callout__reason">
+                      <strong>Reason:</strong> Seller did not respond within 48 hours
+                    </div>
+                  )}
                   {returnItem.rejectionReason && (
                     <div className="decision-callout__reason">
                       <strong>Rejection Reason:</strong>{" "}
@@ -336,6 +358,18 @@ export default function ReturnDetailPage({ params }: PageProps) {
                   <span className="return-detail__label">Customer Name</span>
                   <span className="return-detail__value">
                     {returnItem.customer}
+                  </span>
+                </div>
+                <div className="return-detail__field">
+                  <span className="return-detail__label">Return Reason</span>
+                  <span className="return-detail__value">
+                    {returnItem.returnReason || "Not specified"}
+                  </span>
+                </div>
+                <div className="return-detail__field">
+                  <span className="return-detail__label">Customer Comments</span>
+                  <span className="return-detail__value">
+                    {returnItem.customerComments || "None"}
                   </span>
                 </div>
                 <div className="return-detail__field">

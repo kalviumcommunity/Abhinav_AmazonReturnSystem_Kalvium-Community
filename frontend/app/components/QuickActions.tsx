@@ -11,11 +11,15 @@ interface QuickAction {
   onClick?: () => void;
 }
 
-export default function QuickActions() {
+interface QuickActionsProps {
+  pendingCount: number;
+}
+
+export default function QuickActions({ pendingCount }: QuickActionsProps) {
   const actions: QuickAction[] = [
     {
       label: "Review Pending Returns",
-      description: "24 returns awaiting review",
+      description: `${pendingCount} returns awaiting review`,
       color: "#f59e0b",
       href: "/returns?status=Pending",
       icon: (
@@ -27,21 +31,7 @@ export default function QuickActions() {
         </svg>
       ),
     },
-    {
-      label: "Export Return Report",
-      description: "Download CSV or PDF report",
-      color: "#10b981",
-      onClick: () => {
-        alert("Export Return Report: CSV report generated (mock data).");
-      },
-      icon: (
-        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-          <polyline points="7 10 12 15 17 10" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-          <line x1="12" y1="15" x2="12" y2="3" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
-        </svg>
-      ),
-    },
+
     {
       label: "View All Requests",
       description: "Browse complete return history",
