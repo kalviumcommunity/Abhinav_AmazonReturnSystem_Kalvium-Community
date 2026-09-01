@@ -48,6 +48,8 @@ export interface ReturnRequest {
   decidedBy: string | null;
   decidedAt: string | null;
   rejectionReason: string | null;
+  returnReason?: string | null;
+  customerComments?: string | null;
   createdAt: string;
   updatedAt: string;
   auditLogs?: AuditLog[];
